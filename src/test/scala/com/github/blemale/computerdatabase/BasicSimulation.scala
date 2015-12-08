@@ -1,5 +1,7 @@
 package com.github.blemale.computerdatabase
 
+import io.gatling.core.structure.ChainBuilder
+
 import scala.concurrent.duration._
 
 import io.gatling.core.Predef._
@@ -25,7 +27,12 @@ class BasicSimulation extends Simulation {
   }
 
   object Browse {
-    val browse =
+    def gotoPage(page: Int) = ??? // Extract the repeated exec block
+    val browseWithGotoPage: ChainBuilder = ??? // Implement browse with gotoPage function
+
+    val browseWithRepeat: ChainBuilder = ??? // Implement browse with repeat builtin structure
+
+    val browse: ChainBuilder =
       exec(http("Home")
         .get("/"))
         .pause(2)
