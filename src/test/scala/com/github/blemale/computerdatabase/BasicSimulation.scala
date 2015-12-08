@@ -1,13 +1,26 @@
 package com.github.blemale.computerdatabase // The optional package.
 
-import io.gatling.core.Predef._ // The required imports.
+import io.gatling.core.Predef._
+import io.gatling.core.structure.{ScenarioBuilder, ChainBuilder}
 import io.gatling.http.Predef._
 import scala.concurrent.duration._
 
 class BasicSimulation extends Simulation { // The class declaration. Note that it extends Simulation.
 
-  val httpProtocol = http // The common configuration to all HTTP requests.
-    .baseURL("http://computer-database.gatling.io") // The baseURL that will be prepended to all relative urls.
+  object Search {
+    val search: ChainBuilder = ??? // Extract Search chain, i.e. exec(http(...)).exec(...)...
+  }
+
+  object Browse {
+    val browse: ChainBuilder = ??? // Extract Browse chain
+  }
+
+  object Edit {
+    val edit: ChainBuilder = ??? // Extract Edit chain
+  }
+
+  val httpProtocol = http
+    .baseURL("http://computer-database.gatling.io")
     .inferHtmlResources(BlackList( """.*\.js""", """.*\.css""", """.*\.gif""", """.*\.jpeg""", """.*\.jpg""", """.*\.ico""", """.*\.woff""", """.*\.(t|o)tf""", """.*\.png"""), WhiteList())
 
   val uri1 = "http://computer-database.gatling.io"
@@ -47,7 +60,7 @@ class BasicSimulation extends Simulation { // The class declaration. Note that i
       .formParam("discontinued", "1991-01-01")
       .formParam("company", "6"))
 
-  setUp( // Where one sets up the scenarios that will be launched in this Simulation.
-    scn.inject(atOnceUsers(1)) // Declaring to inject into scenario named scn one single user.
-  ).protocols(httpProtocol) // Attaching the HTTP configuration declared above.
+  val scnWithPageObjects: ScenarioBuilder = ??? // Rewrite scenario using these reusable business processes
+
+  setUp(scnWithPageObjects.inject(atOnceUsers(1))).protocols(httpProtocol)
 }
