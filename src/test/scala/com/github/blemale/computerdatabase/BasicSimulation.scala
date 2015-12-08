@@ -1,6 +1,9 @@
 package com.github.blemale.computerdatabase
 
+import java.util.concurrent.ThreadLocalRandom
+
 import io.gatling.core.structure.ChainBuilder
+import io.gatling.http.check.HttpCheck
 
 import scala.concurrent.duration._
 
@@ -27,7 +30,7 @@ class BasicSimulation extends Simulation {
   }
 
   object Browse {
-    val browse: ChainBuilder =
+    val browse =
       exec(http("Home")
         .get("/"))
         .pause(2)
@@ -39,6 +42,8 @@ class BasicSimulation extends Simulation {
   }
 
   object Edit {
+    val randomFailingCheck: HttpCheck = ??? // Create a random failing check, for instance checking randomly for status code 200, 201, 202
+    
     val edit =
       exec(http("Edit")
         .get("/computers/new"))
@@ -48,7 +53,10 @@ class BasicSimulation extends Simulation {
           .formParam("name", "Amiga 2000")
           .formParam("introduced", "1987-03-01")
           .formParam("discontinued", "1991-01-01")
-          .formParam("company", "6"))
+          .formParam("company", "6")
+          .check(randomFailingCheck))
+
+    val tryMaxEdit: ChainBuilder = ??? // Manage failure by trying at most 2 times the random failing block and exiting the scenario if no attempt succeeded
   }
 
   val httpProtocol = http
@@ -58,7 +66,7 @@ class BasicSimulation extends Simulation {
   val uri1 = "http://computer-database.gatling.io"
 
   val users = scenario("Users").exec(Search.search, Browse.browse)
-  val admins = scenario("Admins").exec(Search.search, Browse.browse, Edit.edit)
+  val admins = scenario("Admins").exec(Search.search, Browse.browse, Edit.tryMaxEdit)
 
   setUp(
     users.inject(rampUsers(10) over (10 seconds)),
