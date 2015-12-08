@@ -1,5 +1,8 @@
 package com.github.blemale.computerdatabase
 
+import io.gatling.core.feeder.{FeederBuilder, RecordSeqFeederBuilder}
+import io.gatling.http.check.HttpCheck
+
 import scala.concurrent.duration._
 
 import io.gatling.core.Predef._
@@ -8,15 +11,22 @@ import io.gatling.http.Predef._
 class BasicSimulation extends Simulation {
 
   object Search {
+    val feeder: FeederBuilder[String] = ??? // Define a csv feeder with random strategy
+    val searchUrl: String = ??? // Parametrize search url with searchCriterion using EL
+    val check: HttpCheck = ??? // Use css check to find and store in session url of computer with name searchComputerName
+    val selectUrl: String = ??? // Parametrize url with url stored in session using EL
+
     val search =
       exec(http("Home")
         .get("/"))
         .pause(2)
+        .feed(feeder)
         .exec(http("Search")
-          .get("/computers?f=macbook"))
+          .get(searchUrl)
+          .check(check))
         .pause(4)
         .exec(http("Select")
-          .get("/computers/516"))
+          .get(selectUrl))
         .pause(3)
   }
 
