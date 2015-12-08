@@ -27,24 +27,15 @@ class BasicSimulation extends Simulation {
   }
 
   object Browse {
-    def gotoPage(page: Int) = ??? // Extract the repeated exec block
-    val browseWithGotoPage: ChainBuilder = ??? // Implement browse with gotoPage function
-
-    val browseWithRepeat: ChainBuilder = ??? // Implement browse with repeat builtin structure
-
     val browse: ChainBuilder =
       exec(http("Home")
         .get("/"))
         .pause(2)
-        .exec(http("Page 1")
-          .get("/computers?p=1"))
-        .pause(2)
-        .exec(http("Page 2")
-          .get("/computers?p=2"))
-        .pause(2)
-        .exec(http("Page 3")
-          .get("/computers?p=3"))
-        .pause(2)
+      .repeat(5, "n") {
+        exec(http("Page ${n}")
+          .get("/computers?p=${n}"))
+          .pause(2)
+      }
   }
 
   object Edit {
