@@ -1,7 +1,5 @@
 package com.github.blemale.computerdatabase
 
-import io.gatling.core.structure.{PopulatedScenarioBuilder, ScenarioBuilder}
-
 import scala.concurrent.duration._
 
 import io.gatling.core.Predef._
@@ -57,10 +55,11 @@ class BasicSimulation extends Simulation {
 
   val uri1 = "http://computer-database.gatling.io"
 
-  val users: ScenarioBuilder = ??? // Define regular users scenario
-  val admins: ScenarioBuilder = ??? // Define admin users scenario
+  val users = scenario("Users").exec(Search.search, Browse.browse)
+  val admins = scenario("Admins").exec(Search.search, Browse.browse, Edit.edit)
 
-  val usersInjection: PopulatedScenarioBuilder = ??? // Inject 10 regular users and ramp them over 10 seconds
-  val adminsInjection: PopulatedScenarioBuilder = ??? // Inject 2 admins, and ramp them over 10 seconds
-  setUp(usersInjection, adminsInjection).protocols(httpProtocol)
+  setUp(
+    users.inject(rampUsers(10) over (10 seconds)),
+    admins.inject(rampUsers(2) over (10 seconds))
+  ).protocols(httpProtocol)
 }
